@@ -1,0 +1,13 @@
+{
+  "accepts": ["id"],
+  "classes": ["ChemblCompound"],
+  "files" : {
+    "css" : "dist/style.css",
+    "js" : "dist/bundle.js"
+  },
+  "toolName" : {
+    "human" :"Alternative Forms",
+    "cljs" :"bluegenesChemblAltForms"    
+  },
+  "version": 2
+}
