@@ -1,32 +1,94 @@
-// add any imports if needed, or write your script directly in this file.
-// const SomePackage = require('PackageName');
-
 // make sure to export main, with the signature
 function main(el, service, imEntity, state, config, navigate) {
 	if (!state) state = {};
 	if (!el || !service || !imEntity || !state || !config) {
 		throw new Error('Call main with correct signature');
 	}
-	// Tips to ensure your tool works correctly in BlueGenes:
-	// - The `el` element is all yours, but please do not manipulate the DOM above this
-	// - Avoid ambiguous query selectors that may end up returning an element not belonging to this tool
-	// - Avoid relying on element IDs, as multiple instances of this tool may be present on one page
 
-	/* Example - you can delete this and replace with your own code *******
+	let entity = imEntity.ChemblCompound;
 
-		// Sample code here to convert the provided InterMine object ID into the data the tool needs.
-		var entity = imEntity.Gene;
-		var mine = new imjs.Service(service);
-		mine.findById(entity.class, entity.value).then(function(obj) {
-			console.log(obj.name + ' is a ' + obj.class + ' you can find in ' + obj.organism.name);
+	var query = {
+		from: entity.class,
+		select: [
+			'identifier',
+			'originalId',
+			'inchiKey',
+			'name',
+			'alternateForms.identifier',
+			'alternateForms.originalId',
+			'alternateForms.inchiKey',
+			'alternateForms.name',
+			'parent.identifier',
+			'parent.originalId',
+			'parent.inchiKey',
+			'parent.name'
+		],
+		joins: ['alternateForms', 'parent'],
+		where: [
+			{
+				path: 'id',
+				op: '=',
+				value: entity.value
+			}
+		]
+	};
+
+	new imjs.Service(service).records(query).then(function(response) {
+		let contents = '<h3>Alternate Forms of Compound in ChEMBL</h3>';
+
+		let entity = response[0];
+		let parent =
+			'itself, <span class="naviLink" id="p' +
+			entity.objectId +
+			'">' +
+			entity.originalId +
+			'</span>';
+		let naviIds = ['p' + entity.objectId];
+		if (entity.parent) {
+			parent =
+				'<span class="naviLink" id="p' +
+				entity.parent.objectId +
+				'">' +
+				entity.parent.originalId +
+				'</span>';
+			naviIds = ['p' + entity.parent.objectId];
+		}
+		contents += '<div>(Parent is ' + parent + ')</div>';
+
+		contents +=
+			'<div style="display: flex; flex-direction: row; flex-wrap: wrap;">';
+		if (entity.alternateForms) {
+			entity.alternateForms.forEach((altf, index) => {
+				contents +=
+					'<div id="altimage' +
+					index +
+					'">' +
+					'<img src="https://www.ebi.ac.uk/chembl/api/data/image/' +
+					altf.inchiKey +
+					'?dimensions=200&format=svg" onerror="document.getElementById(\'altimage' +
+					index +
+					'\').innerHTML = \'Not available.\'"/><br/><span class="naviLink" id="a' +
+					altf.objectId +
+					'">' +
+					altf.originalId +
+					'</span>' +
+					'<br/>' +
+					altf.name +
+					'</div>';
+				naviIds.push('a' + altf.objectId);
+			});
+		}
+		contents += '</div>';
+
+		el.innerHTML = '<div class="rootContainer">' + contents + '</div>';
+
+		naviIds.forEach(element => {
+			let objectId = element.substr(1);
+			document.getElementById(element).onclick = function() {
+				navigate('report', { type: 'ChemblCompound', id: objectId });
+			};
 		});
-	*/
-
-	el.innerHTML = `
-		<div class="rootContainer">
-			<h1>Your Data Viz Here</h1>
-		</div>
-	`;
+	});
 }
 
 module.exports = { main };

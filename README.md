@@ -1,10 +1,11 @@
 #  Alternative Forms
 
 Alternative Forms is a tool made for [BlueGenes](http://bluegenes.apps.intermine.org) following BlueGenes Tool API.
-Add more description of your tool here! :)
+This tool displays alternate forms of compound in [ChEMBL](https://www.ebi.ac.uk/chembl/) for the ChemblCompound class in TargetMine.
 
-## Licence
+## License
 
+The MIT License - see [LICENSE](LICENSE)
 
 ### To set up locally for development
 

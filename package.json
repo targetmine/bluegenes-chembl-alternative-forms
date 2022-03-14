@@ -4,6 +4,10 @@
   "main": "src/index.js",
   "description": "",
   "homepage": "http://www.intermine.org",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:targetmine/bluegenes-chembl-alternative-forms.git"
+  },
   "files": [
     "/dist",
     "/config.json",
